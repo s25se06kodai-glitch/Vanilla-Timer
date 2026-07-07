@@ -1,6 +1,6 @@
 @font-face {
   font-family: "DSEG7-Classic";
-  src: local("DSEG7-Classic"), url("https://cdn.jsdelivr.net/gh/keshikan/DSEG/DSEG7/Classic/DSEG7Classic-Bold.woff2") format("woff2");
+  src: local("DSEG7-Classic"), url("https://cdn.jsdelivr.net/npm/dseg@0.46.0/fonts/DSEG7-Classic/DSEG7Classic-Bold.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
 }
