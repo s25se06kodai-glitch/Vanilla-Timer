@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>00:00 - タイマー</title>
+    <!-- CSS will be linked here -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main class="app-container">
+        <div class="timer-wrapper">
+            
+            <!-- Circular Progress Ring -->
+            <div class="progress-ring-container">
+                <svg class="progress-ring" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background Track -->
+                    <circle class="progress-ring__track" cx="50" cy="50" r="45"></circle>
+                    <!-- Animated Indicator -->
+                    <circle class="progress-ring__indicator" cx="50" cy="50" r="45" id="progress-indicator"></circle>
+                </svg>
+                
+                <!-- Time Display (overlay over SVG) -->
+                <div class="time-display">
+                    <span id="display-minutes">00</span><span class="colon">:</span><span id="display-seconds">00</span>
+                </div>
+            </div>
+
+            <!-- Controls (Buttons) -->
+            <div class="controls-container">
+                <!-- Time Setter Buttons -->
+                <div class="time-setters">
+                    <button type="button" id="btn-minute" class="btn btn-time">分</button>
+                    <button type="button" id="btn-second" class="btn btn-time">秒</button>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="actions">
+                    <button type="button" id="btn-start" class="btn btn-action btn-primary" disabled>スタート</button>
+                    <button type="button" id="btn-reset" class="btn btn-action btn-secondary">リセット</button>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- JavaScript file -->
+    <script src="js/main.js"></script>
+</body>
+</html>

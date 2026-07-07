@@ -1,0 +1,175 @@
+/* This is the compiled CSS from scss/style.scss so the HTML renders immediately without needing a build tool */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overscroll-behavior-y: none;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timer-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  background: #1e293b;
+  padding: 40px 24px;
+  border-radius: 32px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+}
+
+.progress-ring-container {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.4));
+}
+
+.progress-ring__track {
+  fill: none;
+  stroke: #334155;
+  stroke-width: 4;
+}
+
+.progress-ring__indicator {
+  fill: none;
+  stroke: #10b981;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 282.743;
+  stroke-dashoffset: 0;
+  /* 【修正】カクつき防止：JavaScriptと競合する stroke-dashoffset の transition を削除 */
+  transition: stroke 0.3s ease;
+}
+
+.time-display {
+  position: absolute;
+  font-size: 4.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: baseline;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.time-display .colon {
+  margin: 0 4px;
+  position: relative;
+  top: -6px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.controls-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.time-setters, .actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn {
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+.btn:active {
+  transform: scale(0.92);
+}
+
+.btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  filter: grayscale(100%);
+}
+
+.btn-time {
+  background-color: #334155;
+  color: #f8fafc;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  font-weight: 700;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.btn-time:hover {
+  background-color: #475569;
+}
+
+.btn-action {
+  padding: 18px 0;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  flex: 1;
+  max-width: 140px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #ffffff;
+  border: 2px solid #ef4444;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.1);
+}
