@@ -1,4 +1,9 @@
-/* This is the compiled CSS from scss/style.scss so the HTML renders immediately without needing a build tool */
+@font-face {
+  font-family: "DSEG7-Classic";
+  src: local("DSEG7-Classic"), url("https://cdn.jsdelivr.net/gh/keshikan/DSEG/DSEG7/Classic/DSEG7Classic-Bold.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
 * {
   box-sizing: border-box;
   margin: 0;
@@ -38,74 +43,80 @@ body {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
 }
 
-.progress-ring-container {
-  position: relative;
+.lcd-screen {
   width: 100%;
-  max-width: 260px;
-  aspect-ratio: 1 / 1;
+  max-width: 300px;
+  background-color: #9ba896;
+  color: #2c352a;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.2);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  gap: 8px;
+  transition: background-color 0.1s;
 }
 
-.progress-ring {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.4));
-}
-
-.progress-ring__track {
-  fill: none;
-  stroke: #334155;
-  stroke-width: 4;
-}
-
-.progress-ring__indicator {
-  fill: none;
-  stroke: #10b981;
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-dasharray: 282.743;
-  stroke-dashoffset: 0;
-  /* 【修正】カクつき防止：JavaScriptと競合する stroke-dashoffset の transition を削除 */
-  transition: stroke 0.3s ease;
+.brand-title {
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.8;
 }
 
 .time-display {
-  position: absolute;
-  font-size: 4.5rem;
-  font-weight: 800;
-  letter-spacing: 1px;
   display: flex;
   align-items: baseline;
-  color: #ffffff;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  justify-content: center;
 }
-
-.time-display .colon {
+.time-display .lcd-digits {
+  font-family: "DSEG7-Classic", monospace;
+  font-size: 3.5rem;
+  font-weight: bold;
+  line-height: 1;
+  letter-spacing: 2px;
+}
+.time-display .lcd-unit {
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  font-size: 1.2rem;
+  font-weight: bold;
   margin: 0 4px;
-  position: relative;
-  top: -6px;
-  animation: pulse 1.5s infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+.lcd-flash-anim {
+  animation: flash-lcd 0.5s infinite;
 }
 
+@keyframes flash-lcd {
+  0%, 100% {
+    background-color: #9ba896;
+  }
+  50% {
+    background-color: #e09b9b;
+  }
+}
 .controls-container {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+  align-items: center;
 }
 
-.time-setters, .actions {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+.keyboard-hints {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.5fr;
+  gap: 12px;
+  width: 100%;
 }
 
 .btn {
@@ -116,12 +127,15 @@ body {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   touch-action: manipulation;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
-
 .btn:active {
   transform: scale(0.92);
 }
-
 .btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
@@ -132,34 +146,41 @@ body {
 .btn-time {
   background-color: #334155;
   color: #f8fafc;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  font-size: 1.25rem;
-  font-weight: 700;
+  padding: 16px 0;
+  border-radius: 16px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
-
+.btn-time .btn-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.btn-time .key-hint {
+  font-size: 0.65rem;
+  opacity: 0.6;
+}
 .btn-time:hover {
   background-color: #475569;
 }
 
 .btn-action {
-  padding: 18px 0;
+  padding: 16px 0;
   border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+.btn-action .btn-text {
   font-size: 1.1rem;
   font-weight: 700;
-  flex: 1;
-  max-width: 140px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
   letter-spacing: 0.5px;
+}
+.btn-action .key-hint {
+  font-size: 0.65rem;
+  opacity: 0.8;
 }
 
 .btn-primary {
   background-color: #10b981;
   color: #ffffff;
 }
-
 .btn-primary:hover:not(:disabled) {
   background-color: #059669;
 }
@@ -169,7 +190,13 @@ body {
   color: #ffffff;
   border: 2px solid #ef4444;
 }
-
 .btn-secondary:hover:not(:disabled) {
   background-color: rgba(239, 68, 68, 0.1);
 }
+
+.is-locked {
+  opacity: 0.6 !important;
+  pointer-events: none;
+}
+
+/*# sourceMappingURL=style.css.map */

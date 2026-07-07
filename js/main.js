@@ -1,5 +1,6 @@
 /**
  * Vanilla-Timer Main Logic (Pointer Events / Mobile & PC Compatible Version)
+ * Jicchan LCD Edition
  */
 
 // --- DOM Elements ---
@@ -8,8 +9,7 @@ const displaySeconds = document.getElementById('display-seconds');
 const btnMinute = document.getElementById('btn-minute');
 const btnSecond = document.getElementById('btn-second');
 const btnStart = document.getElementById('btn-start');
-const btnReset = document.getElementById('btn-reset');
-const progressIndicator = document.getElementById('progress-indicator');
+const lcdContainer = document.getElementById('lcd-container');
 
 // --- State Variables ---
 let remainingSeconds = 0;
@@ -30,22 +30,9 @@ let alarmInterval = null;
 // Wake Lock
 let wakeLock = null;
 
-// Constants
-const MAX_SECONDS = 99 * 60 + 59; // 5999秒 (99:59)
-const CIRCUMFERENCE = 2 * Math.PI * 45; // 282.743
-
-// --- Initialization ---
+// Initialization
 function init() {
-    progressIndicator.style.strokeDasharray = CIRCUMFERENCE;
     updateDisplay();
-    updateRingSetting();
-    
-    // Service Worker placeholder
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            console.log('Service Worker placeholder: Ready for future PWA registration.');
-        });
-    }
 }
 
 // --- Audio API ---
@@ -139,28 +126,12 @@ function updateDisplay() {
     displaySeconds.textContent = sStr;
     
     if (isRunning) {
-        document.title = `${mStr}:${sStr} - タイマー`;
+        document.title = `${mStr}分${sStr}秒 - タイマー`;
     } else if (remainingSeconds > 0) {
-        document.title = `${mStr}:${sStr} - タイマー(設定中)`;
+        document.title = `${mStr}分${sStr}秒 - タイマー(設定中)`;
     } else {
-        document.title = `00:00 - タイマー`;
+        document.title = `00分00秒 - タイマー`;
     }
-}
-
-function updateRingSetting() {
-    if (remainingSeconds === 0) {
-        progressIndicator.style.strokeDashoffset = CIRCUMFERENCE;
-        return;
-    }
-    
-    const percent = remainingSeconds / MAX_SECONDS;
-    const offset = CIRCUMFERENCE - (Math.min(1, percent) * CIRCUMFERENCE);
-    progressIndicator.style.strokeDashoffset = offset;
-}
-
-function updateRingRunning(percent) {
-    const offset = CIRCUMFERENCE - (percent * CIRCUMFERENCE);
-    progressIndicator.style.strokeDashoffset = offset;
 }
 
 // --- Timer Logic ---
@@ -171,14 +142,13 @@ function incrementTime(type) {
     let s = remainingSeconds % 60;
     
     if (type === 'min') {
-        m = Math.min(m + 1, 99);
+        m = m >= 99 ? 0 : m + 1;
     } else {
-        s = Math.min(s + 1, 59);
+        s = s >= 59 ? 0 : s + 1;
     }
     
     remainingSeconds = m * 60 + s;
     updateDisplay();
-    updateRingSetting();
     
     btnStart.disabled = remainingSeconds === 0;
 }
@@ -191,12 +161,11 @@ function startTimer() {
     initialSeconds = remainingSeconds;
     targetTime = Date.now() + remainingSeconds * 1000;
     
-    btnStart.textContent = '一時停止';
+    btnStart.querySelector('.btn-text').textContent = '一時停止';
     btnStart.classList.replace('btn-primary', 'btn-secondary');
     
-    btnMinute.disabled = true;
-    btnSecond.disabled = true;
-    btnReset.disabled = true;
+    btnMinute.classList.add('is-locked');
+    btnSecond.classList.add('is-locked');
     
     requestWakeLock();
     
@@ -219,14 +188,12 @@ function pauseTimer() {
     remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
     
     updateDisplay();
-    updateRingSetting();
     
-    btnStart.textContent = 'スタート';
+    btnStart.querySelector('.btn-text').textContent = 'スタート';
     btnStart.classList.replace('btn-secondary', 'btn-primary');
     
-    btnMinute.disabled = false;
-    btnSecond.disabled = false;
-    btnReset.disabled = false;
+    btnMinute.classList.remove('is-locked');
+    btnSecond.classList.remove('is-locked');
     
     releaseWakeLock();
 }
@@ -245,7 +212,6 @@ function resetTimer() {
     remainingSeconds = 0;
     initialSeconds = 0;
     updateDisplay();
-    updateRingSetting();
     btnStart.disabled = true;
 }
 
@@ -263,9 +229,6 @@ function loop() {
             updateDisplay();
         }
         
-        const percent = remainingMs / (MAX_SECONDS * 1000);
-        updateRingRunning(Math.max(0, Math.min(1, percent)));
-        
         animationFrameId = requestAnimationFrame(loop);
     }
 }
@@ -278,35 +241,33 @@ function timeUp() {
     
     remainingSeconds = 0;
     updateDisplay();
-    updateRingRunning(0);
     
-    btnStart.textContent = 'ストップ';
+    btnStart.querySelector('.btn-text').textContent = 'ストップ';
     btnStart.classList.replace('btn-secondary', 'btn-primary');
     btnStart.disabled = false;
     
     playAlarm();
+    lcdContainer.classList.add('lcd-flash-anim');
     
     autoStopTimeout = setTimeout(() => {
         if (isAlarming) {
             stopAlarmAndReset();
         }
-    }, 60000); // Auto-stop after 1 minute
+    }, 3000); // Auto-stop after 3 seconds
 }
 
 function resetToInitial() {
     remainingSeconds = initialSeconds;
     updateDisplay();
-    updateRingSetting();
     
-    btnStart.textContent = 'スタート';
+    btnStart.querySelector('.btn-text').textContent = 'スタート';
     if (btnStart.classList.contains('btn-secondary')) {
         btnStart.classList.replace('btn-secondary', 'btn-primary');
     }
     btnStart.disabled = false;
     
-    btnMinute.disabled = false;
-    btnSecond.disabled = false;
-    btnReset.disabled = false;
+    btnMinute.classList.remove('is-locked');
+    btnSecond.classList.remove('is-locked');
     
     releaseWakeLock();
 }
@@ -316,6 +277,7 @@ function stopAlarmAndReset() {
     alarmStopLock = true;
     
     stopAlarmSound();
+    lcdContainer.classList.remove('lcd-flash-anim');
     
     if (autoStopTimeout) {
         clearTimeout(autoStopTimeout);
@@ -330,11 +292,39 @@ function stopAlarmAndReset() {
     }, 500);
 }
 
+function triggerFullReset() {
+    handleTimeSetEnd();
+    if (isAlarming) {
+        stopAlarmAndReset();
+    }
+    if (isRunning) {
+        pauseTimer();
+    }
+    initAudio();
+    remainingSeconds = 0;
+    initialSeconds = 0;
+    updateDisplay();
+    btnStart.disabled = true;
+}
+
 // --- Event Listeners ---
 
-// 1. Long Press Logic (【修正】Pointer Eventsに統一してPC・スマホ両対応)
+// 1. Long Press Logic & Simultaneous Reset
 let pressTimer = null;
 let pressInterval = null;
+
+let isQPressed = false;
+let isWPressed = false;
+let minPointerActive = false;
+let secPointerActive = false;
+
+function checkSimultaneousReset() {
+    if ((isQPressed && isWPressed) || (minPointerActive && secPointerActive)) {
+        triggerFullReset();
+        return true;
+    }
+    return false;
+}
 
 function handleTimeSetStart(type) {
     if (isRunning || isAlarming) return;
@@ -344,8 +334,8 @@ function handleTimeSetStart(type) {
     pressTimer = setTimeout(() => {
         pressInterval = setInterval(() => {
             incrementTime(type);
-        }, 120);
-    }, 400);
+        }, 100);
+    }, 500);
 }
 
 function handleTimeSetEnd() {
@@ -353,33 +343,35 @@ function handleTimeSetEnd() {
     clearInterval(pressInterval);
 }
 
-function bindLongPress(button, type) {
-    // pointerdown はマウスのクリックもスマホのタッチも両方同時にカバーします
-    button.addEventListener('pointerdown', (e) => {
-        // マウス操作の時は左クリック（ボタン0）だけを許可
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
-        
-        handleTimeSetStart(type);
-    });
+btnMinute.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    minPointerActive = true;
+    if (checkSimultaneousReset()) return;
+    handleTimeSetStart('min');
+});
+
+btnSecond.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    secPointerActive = true;
+    if (checkSimultaneousReset()) return;
+    handleTimeSetStart('sec');
+});
+
+function handlePointerUp() {
+    minPointerActive = false;
+    secPointerActive = false;
+    handleTimeSetEnd();
 }
+window.addEventListener('pointerup', handlePointerUp);
+window.addEventListener('pointercancel', handlePointerUp);
 
-bindLongPress(btnMinute, 'min');
-bindLongPress(btnSecond, 'sec');
 
-// 解除処理も共通化
-window.addEventListener('pointerup', handleTimeSetEnd);
-window.addEventListener('pointercancel', handleTimeSetEnd);
-
-// 2. Button Clicks (標準のクリックイベントでPC・スマホ共に確実に発火)
+// 2. Button Clicks
 btnStart.addEventListener('click', () => {
     if (isAlarming) return;
     toggleTimer();
 });
 
-btnReset.addEventListener('click', () => {
-    if (isAlarming) return;
-    resetTimer();
-});
 
 // 3. Spam & Alarm Interaction Capture
 function captureInteraction(e) {
@@ -392,21 +384,40 @@ function captureInteraction(e) {
 
 window.addEventListener('keydown', captureInteraction, true);
 window.addEventListener('click', captureInteraction, true);
-window.addEventListener('pointerdown', captureInteraction, true); // タッチでのアラーム停止を確実に
+window.addEventListener('pointerdown', captureInteraction, true);
+
 
 // 4. Keyboard Shortcuts
 window.addEventListener('keydown', (e) => {
     if (isAlarming) return;
-    
-    if (e.code === 'Space') {
+    if (e.repeat) return; // Prevent OS auto-repeat
+
+    if (e.code === 'KeyQ' || e.key === 'q' || e.key === 'Q') {
+        isQPressed = true;
+        if (checkSimultaneousReset()) return;
+        handleTimeSetStart('min');
+    }
+    if (e.code === 'KeyW' || e.key === 'w' || e.key === 'W') {
+        isWPressed = true;
+        if (checkSimultaneousReset()) return;
+        handleTimeSetStart('sec');
+    }
+    if (e.code === 'KeyE' || e.key === 'e' || e.key === 'E') {
         e.preventDefault();
         if (!btnStart.disabled) {
             btnStart.click();
         }
-    } else if (e.code === 'KeyR' || e.key === 'r' || e.key === 'R') {
-        if (!btnReset.disabled) {
-            btnReset.click();
-        }
+    }
+});
+
+window.addEventListener('keyup', (e) => {
+    if (e.code === 'KeyQ' || e.key === 'q' || e.key === 'Q') {
+        isQPressed = false;
+        handleTimeSetEnd();
+    }
+    if (e.code === 'KeyW' || e.key === 'w' || e.key === 'W') {
+        isWPressed = false;
+        handleTimeSetEnd();
     }
 });
 
